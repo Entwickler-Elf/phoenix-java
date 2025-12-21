@@ -1,0 +1,2 @@
+ALTER TABLE example
+    ADD COLUMN city TEXT;
