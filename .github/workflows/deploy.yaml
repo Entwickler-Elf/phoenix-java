@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 25
         run: |
@@ -34,7 +34,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
             echo "Deploying to production..."
