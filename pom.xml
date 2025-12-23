@@ -28,6 +28,7 @@
     </scm>
     <properties>
         <java.version>25</java.version>
+        <maven.compiler.release>25</maven.compiler.release>
         <flyway.version>11.18.0</flyway.version>
         <!-- Define the property here. It will pick up the -D flag or the env var -->
         <jib.to.auth.username>coycatz</jib.to.auth.username>
