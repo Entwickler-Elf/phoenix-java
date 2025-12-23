@@ -20,8 +20,8 @@ jobs:
       - name: Build and Push with Jib
         run: |
           ./mvnw compile jib:build \
-            -Djib.to.auth.username=${{ secrets.DOCKER_USERNAME }} \
-            -Djib.to.auth.password=${{ secrets.DOCKER_PASSWORD }}
+            -Djib.to.auth.username=coycatz \
+            -Djib.to.auth.password=${{ secrets.DOCKERHUB_TOKEN }}
 
   deploy:
     needs: build # Only run if the Jib build succeeds

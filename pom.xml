@@ -153,10 +153,10 @@
                 <version>3.5.1</version>
                 <configuration>
                     <from>
-                        <image>eclipse-temurin:25-jre-jammy</image>
+                        <image>public.ecr.aws/docker/library/eclipse-temurin:25-jre-jammy</image>
                     </from>
                     <to>
-                        <image>coycatz/phoenix-v1:${project.version}</image>
+                        <image>coycatz/phoenix-v1-java:${project.version}</image>
                     </to>
                     <container>
                         <mainClass>com.stromsland.phoenixv1java.PhoenixV1JavaApplication</mainClass>
