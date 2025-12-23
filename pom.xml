@@ -29,6 +29,9 @@
     <properties>
         <java.version>25</java.version>
         <flyway.version>11.18.0</flyway.version>
+        <!-- Define the property here. It will pick up the -D flag or the env var -->
+        <jib.to.auth.username>coycatz</jib.to.auth.username>
+        <jib.to.auth.password/>
     </properties>
     <dependencies>
         <dependency>
@@ -147,40 +150,52 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>3.5.1</version>
-                <configuration>
-                    <from>
-                        <image>public.ecr.aws/docker/library/eclipse-temurin:25-jre-jammy</image>
-                    </from>
-                    <to>
-                        <image>coycatz/phoenix-v1-java:${project.version}</image>
-                    </to>
-                    <container>
-                        <mainClass>com.stromsland.phoenixv1java.PhoenixV1JavaApplication</mainClass>
-                        <user>springboot:springboot</user>
-                        <args>
-                            <arg>-XX:MaxRAMPercentage=80.0</arg>
-                            <arg>-Dspring.profiles.active=dev</arg>
-                        </args>
-                        <ports>
-                            <port>8080</port>
-                        </ports>
-                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
-                    </container>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
-
+    <profiles>
+        <profile>
+            <id>push-image</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <version>3.5.1</version>
+                        <configuration>
+                            <from>
+                                <image>public.ecr.aws/docker/library/eclipse-temurin:25-jre-jammy</image>
+                            </from>
+                            <to>
+                                <image>coycatz/phoenix-v1-java:${project.version}</image>
+                                <auth>
+                                    <username>coycatz</username>
+                                    <password>${jib.to.auth.password}</password>
+                                </auth>
+                            </to>
+                            <container>
+                                <mainClass>com.stromsland.phoenixv1java.PhoenixV1JavaApplication</mainClass>
+                                <user>springboot:springboot</user>
+                                <args>
+                                    <arg>-XX:MaxRAMPercentage=80.0</arg>
+                                    <arg>-Dspring.profiles.active=dev</arg>
+                                </args>
+                                <ports>
+                                    <port>8080</port>
+                                </ports>
+                                <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                            </container>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
