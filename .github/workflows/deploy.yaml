@@ -5,40 +5,45 @@ on:
     branches:
       - main
 
+env:
+  JAVA_VERSION: '25'
+  DOCKER_USER: coycatz
+
+
 jobs:
-  build:
+  build-and-push:
+    name: Build and Push Docker Image
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Set up JDK 25
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
         run: |
-          # These commands set the Java environment for all subsequent steps
-          # Replace /usr/lib/jvm/java-25-openjdk with the actual path on your runner
           echo "JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64" >> $GITHUB_ENV
           echo "/usr/lib/jvm/java-25-openjdk-amd64/bin" >> $GITHUB_PATH
 
       - name: Build and Push with Jib
         env:
-          # Using an environment variable is often cleaner for Jib
           JIB_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           chmod +x mvnw
-         ./mvnw clean package jib:build -Ppush-image -Djib.to.auth.password=$JIB_PASSWORD
-  deploy:
-    needs: build
+          ./mvnw clean package jib:build -Ppush-image -Djib.to.auth.password=$JIB_PASSWORD
+
+  deploy-to-production:
+    name: Deploy to Production
+    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Execute remote deployment commands via SSH
+      - name: SSH Remote Commands
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            echo "Deploying to production..."
-            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u coycatz --password-stdin
+            echo "Starting deployment..."
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ env.DOCKER_USER }} --password-stdin
             docker compose pull backend
             docker compose up -d backend
             docker logout
