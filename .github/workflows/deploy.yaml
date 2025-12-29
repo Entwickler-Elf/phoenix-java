@@ -19,6 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Set lower case owner name
+        run: |
+          echo "LOWER_IMAGE_NAME=${{ env.REGISTRY }}/${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+
+
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v5.1.0
         with:
@@ -30,8 +35,11 @@ jobs:
         run: |
           chmod +x mvnw
           ./mvnw clean package jib:build -Ppush-image \
+            -Djib.to.image=${{ env.IMAGE_NAME }} \
+            -Djib.to.tags=${{ env.IMAGE_TAG }} \
             -Djib.to.auth.username=${{ secrets.GH_USERNAME }} \
             -Djib.to.auth.password=${{ secrets.GH_TOKEN }}
+
 
   deploy:
     needs: build-and-push
@@ -39,6 +47,10 @@ jobs:
       group: cyclops
       labels: self-hosted
     steps:
+      - name: Set lower case owner name
+        run: |
+          echo "IMAGE_NAME=${{ env.REGISTRY }}/${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
