@@ -21,7 +21,7 @@ jobs:
 
       - name: Set lower case owner name
         run: |
-          echo "LOWER_IMAGE_NAME=${{ env.REGISTRY }}/${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+          echo "IMAGE_NAME=${{ env.REGISTRY }}/${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
 
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
