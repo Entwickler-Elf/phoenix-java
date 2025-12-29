@@ -201,7 +201,7 @@
                                     <arg>-Dspring.profiles.active=dev</arg>
                                 </args>
                                 <ports>
-                                    <port>8080</port>
+                                    <port>8090</port>
                                 </ports>
                                 <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                             </container>
