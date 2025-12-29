@@ -58,7 +58,7 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Pull image
-        run: docker pull ${{ env.LOWER_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+        run: docker pull ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
       - name: Stop and remove existing container
         run: |
@@ -76,7 +76,7 @@ jobs:
             --name phoenix-java \
             --restart always \
             -p 80:8090 \
-            ${{ env.LOWER_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
           sleep 5
           if [ "$(docker inspect -f '{{.State.Running}}' phoenix-java)" != "true" ]; then
