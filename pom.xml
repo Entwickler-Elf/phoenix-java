@@ -196,7 +196,6 @@
                             </to>
                             <container>
                                 <mainClass>com.stromsland.phoenixv1java.PhoenixV1JavaApplication</mainClass>
-                                <user>springboot:springboot</user>
                                 <args>
                                     <arg>-XX:MaxRAMPercentage=80.0</arg>
                                     <arg>-Dspring.profiles.active=dev</arg>
