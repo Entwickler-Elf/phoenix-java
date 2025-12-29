@@ -8,7 +8,6 @@ on:
 env:
   JAVA_VERSION: '21'
   REGISTRY: ghcr.io
-  IMAGE_NAME: ghcr.io/${{ github.repository }}
   IMAGE_TAG: 0.0.1-SNAPSHOT
 
 
