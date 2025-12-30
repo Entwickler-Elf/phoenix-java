@@ -9,8 +9,8 @@ env:
   JAVA_VERSION: '21'
   REGISTRY: ghcr.io
   IMAGE_TAG: 0.0.1-SNAPSHOT
-  HOST_PORT: 8090
   CONTAINER_PORT: 8080
+  DOCKER_NETWORK: phoenix-network
 
 
 jobs:
@@ -52,6 +52,8 @@ jobs:
         run: |
           echo "IMAGE_NAME=$(echo ${{ env.REGISTRY }}/${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
+      - name: Create Docker Network
+        run: docker network create ${{ env.DOCKER_NETWORK }} || true
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -80,7 +82,11 @@ jobs:
           docker run -d \
             --name phoenix-java \
             --restart always \
-            -p ${{ env.HOST_PORT }}:${{ env.CONTAINER_PORT }} \
+            --network ${{ env.DOCKER_NETWORK }} \
+            -e SPRING_PROFILES_ACTIVE=dev \
+            -e POSTGRES_URL=jdbc:postgresql://postgres-db:5432/jobhunt \
+            -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+            -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
             ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
           sleep 5
