@@ -9,6 +9,8 @@ env:
   JAVA_VERSION: '21'
   REGISTRY: ghcr.io
   IMAGE_TAG: 0.0.1-SNAPSHOT
+  HOST_PORT: 8090
+  CONTAINER_PORT: 8080
 
 
 jobs:
@@ -35,6 +37,7 @@ jobs:
           chmod +x mvnw
           ./mvnw clean package jib:build -Ppush-image \
             -Dimage=${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
+            -Djib.container.ports=${{ env.CONTAINER_PORT }} \
             -Djib.to.auth.username=${{ secrets.GH_USERNAME }} \
             -Djib.to.auth.password=${{ secrets.GH_TOKEN }}
 
@@ -65,8 +68,10 @@ jobs:
           docker stop phoenix-java || true
           docker rm phoenix-java || true
 
-          PORT_OWNER=$(docker ps -q --filter "publish=8090")
+          # Force release the port if still occupied
+          PORT_OWNER=$(docker ps -q --filter "publish=${{ env.HOST_PORT }}")
           if [ ! -z "$PORT_OWNER" ]; then
+            echo "Stopping container $PORT_OWNER using port ${{ env.HOST_PORT }}"
             docker stop $PORT_OWNER || true
           fi
 
@@ -75,7 +80,7 @@ jobs:
           docker run -d \
             --name phoenix-java \
             --restart always \
-            -p 80:8090 \
+            -p ${{ env.HOST_PORT }}:${{ env.CONTAINER_PORT }} \
             ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
           sleep 5
