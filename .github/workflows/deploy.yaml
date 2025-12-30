@@ -70,13 +70,6 @@ jobs:
           docker stop phoenix-java || true
           docker rm phoenix-java || true
 
-          # Force release the port if still occupied
-          PORT_OWNER=$(docker ps -q --filter "publish=${{ env.HOST_PORT }}")
-          if [ ! -z "$PORT_OWNER" ]; then
-            echo "Stopping container $PORT_OWNER using port ${{ env.HOST_PORT }}"
-            docker stop $PORT_OWNER || true
-          fi
-
       - name: Run new container
         run: |
           docker run -d \
