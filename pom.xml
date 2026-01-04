@@ -35,6 +35,7 @@
         <!-- Define the property here. It will pick up the -D flag or the env var -->
         <jib.to.auth.username/>
         <jib.to.auth.password/>
+        <image.base>public.ecr.aws/docker/library/eclipse-temurin:21-jre-jammy</image.base>
     </properties>
 
     <dependencyManagement>
@@ -129,6 +130,10 @@
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -176,7 +181,7 @@
                     </to>
                     <from>
                         <image>
-                            rootioinc/common-eclipse-temurin:21.0.8_9-jdk-ubuntu-noble@sha256:e8e75466b0cebf19b777838e42335ac6485c5aba6ac301e482da941a277b10e9
+                            ${image.base}
                         </image>
                     </from>
                 </configuration>
@@ -214,7 +219,9 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>public.ecr.aws/docker/library/eclipse-temurin:21-jre-jammy</image>
+                                <image>
+                                    ${image.base}
+                                </image>
                             </from>
                             <to>
                                 <image>ghcr.io/entwickler-elf/phoenix-java:${project.version}</image>
