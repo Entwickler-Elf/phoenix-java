@@ -1,0 +1,50 @@
+**Connect to a specific database:**
+
+```shell script
+# Connect to jobhunt database
+docker exec -it postgres-jobhunt psql -U phoenix -d jobhunt
+```
+
+
+**Once connected, use these commands:**
+
+```sql
+-- List all tables
+\dt
+
+-- List tables with more details
+\dt+
+
+-- Describe a specific table structure
+\d table_name
+
+-- List all schemas
+\dn
+
+-- List all tables in all schemas
+\dt *.*
+
+-- Show table with data
+SELECT * FROM table_name LIMIT 10;
+
+-- Exit
+\q
+```
+
+
+**Quick one-liner to see tables without entering interactive mode:**
+
+```shell script
+# List all tables in jobhunt database
+docker exec -it postgres-jobhunt psql -U phoenix -d jobhunt -c "\dt"
+
+# Query a specific table
+docker exec -it postgres-jobhunt psql -U phoenix -d jobhunt -c "SELECT * FROM recruiters LIMIT 5;"
+```
+
+
+**Connect to keycloak database:**
+
+```shell script
+docker exec -it keycloak-postgres psql -U keycloak -d keycloak -c "\dt"
+```

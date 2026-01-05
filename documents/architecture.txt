@@ -1,0 +1,58 @@
+I have 2 machines. Machine 1 is called zeus.  it is used as a
+development machine. It has 8 cpus with around 250 GB space and 6 GB RAM
+and 60g of disk space. It is running POP-OS COSMIC. Machine 2 is running
+ubuntu server. It has 4 cpus, 2.5g ram space remaining and 3.7g total. There
+are 52 g space remaining on machine 2. I want to deploy a docker container for
+an app called phoenix-java and another app called phoenix angular. Phoenix-angular
+ will be available on port 8443, There will be a container network called
+ phoenix-network. phoenix-angular will communicate with phoenix-java using
+ the phoenix-network on port 8080. There is a postgres database named jobhunt
+ running on machine 1. The phoenix-java app will comnmmunicate with it over port
+ 5432. I need to use keycloak for authentication.
+
+ - where should keycloak be deployed?
+ - where should the postgres database be deployed?
+ - what is the network topology?
+ - what is the docker compose file?
+
+
+┌─────────────────────────────────────────────────────────────┐
+│ Machine 1 (zeus) - Development                              │
+│ 8 CPUs, 6 GB RAM, 60 GB disk                               │
+│                                                             │
+│  ┌──────────────────────────────────────┐                  │
+│  │ Docker Network: keycloak-net         │                  │
+│  │                                      │                  │
+│  │  ┌─────────────┐    ┌─────────────┐ │                  │
+│  │  │  Keycloak   │────│  Postgres   │ │                  │
+│  │  │   :8080     │    │   :5432     │ │                  │
+│  │  │             │    │ DB:keycloak │ │                  │
+│  │  └──────┬──────┘    │ DB:jobhunt  │ │                  │
+│  │         │           └─────────────┘ │                  │
+│  └─────────┼──────────────────────────┘                  │
+│            │                                               │
+│            │ Exposed on host :8080                         │
+└────────────┼───────────────────────────────────────────────┘
+             │
+             │ HTTPS (public network)
+             │
+┌────────────┼───────────────────────────────────────────────┐
+│ Machine 2 (ubuntu-server) - Production                     │
+│ 4 CPUs, 2.5 GB RAM, 52 GB disk                            │
+│            │                                                │
+│  ┌─────────┼──────────────────────────────────┐            │
+│  │         │  Docker Network: phoenix-network │            │
+│  │         │                                   │            │
+│  │  ┌──────┴─────────┐    ┌────────────────┐ │            │
+│  │  │ phoenix-angular│    │  phoenix-java  │ │            │
+│  │  │    (Nginx)     │────│    :8080       │ │            │
+│  │  │    :8443       │    │                │ │            │
+│  │  └────────────────┘    └────────┬───────┘ │            │
+│  │                                  │         │            │
+│  └──────────────────────────────────┼─────────┘            │
+│                                     │                      │
+│                                     │ Network to Machine 1 │
+│                                     │ postgres:5432        │
+│                                     │ keycloak:8080        │
+└─────────────────────────────────────┼──────────────────────┘
+                                      │

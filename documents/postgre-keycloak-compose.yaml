@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: keycloak
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: true
+      KC_HOSTNAME_STRICT: false
+      JAVA_OPTS: "-Xms512m -Xmx1024m"
+    command:
+      - start-dev
+    ports:
+      - "8080:8080"
+    networks:
+      - keycloak-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-zeus
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-dbs.sql:/docker-entrypoint-initdb.d/init-dbs.sql
+    ports:
+      - "5432:5432"  # Exposed for Machine 2 access
+    networks:
+      - keycloak-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    restart: unless-stopped
+
+networks:
+  keycloak-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local
